@@ -1,0 +1,228 @@
+Practical 1 - Image Enhancement 
+# Import the necessary libraries
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the image (change filename if needed)
+image = cv2.imread('GFG.jpeg')
+
+# Convert BGR to RGB for correct display with matplotlib
+image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+# -----------------------------
+# 1. Brightness and Contrast Adjustment
+# -----------------------------
+brightness = 10
+contrast = 2.3
+
+# Apply brightness and contrast
+image_bc = cv2.addWeighted(image, contrast, np.zeros(image.shape, image.dtype), 0, brightness)
+image_bc_rgb = cv2.cvtColor(image_bc, cv2.COLOR_BGR2RGB)
+
+# Save the modified image
+cv2.imwrite('modified_image.jpg', image_bc)
+
+# -----------------------------
+# 2. Image Sharpening
+# -----------------------------
+kernel = np.array([[0, -1, 0],
+                   [-1, 5, -1],
+                   [0, -1, 0]])
+
+sharpened_image = cv2.filter2D(image, -1, kernel)
+sharpened_image_rgb = cv2.cvtColor(sharpened_image, cv2.COLOR_BGR2RGB)
+
+cv2.imwrite('sharpened_image.jpg', sharpened_image)
+
+# -----------------------------
+# 3. Color Enhancement using HSV
+# -----------------------------
+# Convert to HSV
+image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV).astype("float32")
+
+# Enhance HSV channels
+image_hsv[:, :, 0] *= 0.7     # Hue
+image_hsv[:, :, 1] *= 1.5     # Saturation
+image_hsv[:, :, 2] *= 0.5     # Value
+
+# Clip values to valid range
+image_hsv = np.clip(image_hsv, 0, 255).astype("uint8")
+
+# Convert back to BGR
+enhanced_color = cv2.cvtColor(image_hsv, cv2.COLOR_HSV2BGR)
+enhanced_color_rgb = cv2.cvtColor(enhanced_color, cv2.COLOR_BGR2RGB)
+
+cv2.imwrite('enhanced_coloured.jpg', enhanced_color)
+
+# -----------------------------
+# Display all results
+# -----------------------------
+plt.figure(figsize=(12, 10))
+
+# Original
+plt.subplot(2, 2, 1)
+plt.imshow(image_rgb)
+plt.title("Original")
+plt.axis('off')
+
+# Brightness & Contrast
+plt.subplot(2, 2, 2)
+plt.imshow(image_bc_rgb)
+plt.title("Brightness & Contrast")
+plt.axis('off')
+
+# Sharpened
+plt.subplot(2, 2, 3)
+plt.imshow(sharpened_image_rgb)
+plt.title("Sharpened")
+plt.axis('off')
+
+# Enhanced Color
+plt.subplot(2, 2, 4)
+plt.imshow(enhanced_color_rgb)
+plt.title("Enhanced Color")
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+Practical 2 - Image Transformation
+import cv2
+import numpy as np
+
+# Read the Image
+img = cv2.imread('your_image.jpg')
+
+# Show Original Image
+cv2.imshow('Original Image', img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 1. Translation (Moving the image)
+rows, cols = img.shape[:2]
+M = np.float32([[1, 0, 100], [0, 1, 50]])
+translated_img = cv2.warpAffine(img, M, (cols, rows))
+cv2.imshow('Translated Image', translated_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 2. Rotation
+center = (cols // 2, rows // 2)
+M = cv2.getRotationMatrix2D(center, 45, 1.0)
+rotated_img = cv2.warpAffine(img, M, (cols, rows))
+cv2.imshow('Rotated Image', rotated_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 3. Resizing
+resized_img = cv2.resize(img, (300, 300), interpolation=cv2.INTER_LINEAR)
+cv2.imshow('Resized Image', resized_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 4. Flipping
+flipped_img = cv2.flip(img, 1)  # Horizontal flip
+cv2.imshow('Flipped Image', flipped_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 5. Affine Transformation
+pts1 = np.float32([[50, 50], [200, 50], [50, 200]])
+pts2 = np.float32([[10, 100], [200, 50], [100, 250]])
+M = cv2.getAffineTransform(pts1, pts2)
+affine_img = cv2.warpAffine(img, M, (cols, rows))
+cv2.imshow('Affine Transform', affine_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 6. Perspective Transformation
+pts1 = np.float32([[56,65], [368,52], [28,387], [389,390]])
+pts2 = np.float32([[0,0], [300,0], [0,300], [300,300]])
+M = cv2.getPerspectiveTransform(pts1, pts2)
+perspective_img = cv2.warpPerspective(img, M, (300, 300))
+cv2.imshow('Perspective Transform', perspective_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+  
+
+Practical 3 - Smoothing and Blurring
+
+
+import cv2
+import numpy as np
+
+# Load the image
+image = cv2.imread('your_image.jpg')
+
+# Check if image loaded successfully
+if image is None:
+    print("Error: Could not load image. Please check the file path.")
+else:
+    # 1. Averaging (Mean Filter)
+    blurred_average = cv2.blur(image, (5, 5))
+
+    # 2. Gaussian Blur
+    blurred_gaussian = cv2.GaussianBlur(image, (5, 5), 0)
+
+    # 3. Median Blur
+    blurred_median = cv2.medianBlur(image, 5)
+
+    # 4. Bilateral Filter
+    blurred_bilateral = cv2.bilateralFilter(image, 9, 75, 75)
+
+    # Display all images
+    cv2.imshow('Original Image', image)
+    cv2.imshow('Average Blur', blurred_average)
+    cv2.imshow('Gaussian Blur', blurred_gaussian)
+    cv2.imshow('Median Blur', blurred_median)
+    cv2.imshow('Bilateral Filter', blurred_bilateral)
+
+    # Wait and close windows
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+Practical 4 - Circle Detection
+
+import cv2
+import numpy as np
+
+# Load the image
+image = cv2.imread('circles.png')  # Replace with your own image path
+if image is None:
+    print("Error: Image not found.")
+    exit()
+
+# Copy for drawing results
+output = image.copy()
+
+# Convert to grayscale
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# Apply Gaussian blur to reduce noise and improve detection
+gray_blurred = cv2.GaussianBlur(gray, (9, 9), 2)
+
+# Detect circles using HoughCircles
+circles = cv2.HoughCircles(gray_blurred,
+                           cv2.HOUGH_GRADIENT,
+                           dp=1.2,
+                           minDist=20,
+                           param1=50,
+                           param2=30,
+                           minRadius=0,
+                           maxRadius=0)
+
+# If circles are detected
+if circles is not None:
+    circles = np.uint16(np.around(circles))
+    for i in circles[0, :]:
+        # Draw outer circle
+        cv2.circle(output, (i[0], i[1]), i[2], (0, 255, 0), 2)
+        # Draw center point
+        cv2.circle(output, (i[0], i[1]), 2, (0, 0, 255), 3)
+
+# Show the result
+cv2.imshow('Detected Circles', output)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
